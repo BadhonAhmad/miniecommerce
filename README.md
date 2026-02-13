@@ -5,7 +5,7 @@ A comprehensive backend API for an online shopping platform with authentication,
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white)
 
 ## 🚀 Features
@@ -67,7 +67,7 @@ A comprehensive backend API for an online shopping platform with authentication,
 ├─────────────────────────────────────┤
 │         Repositories Layer          │  ← Data Access
 ├─────────────────────────────────────┤
-│         Database (PostgreSQL)       │  ← Data Storage
+│         Database (SQLite)           │  ← Data Storage
 └─────────────────────────────────────┘
 ```
 
@@ -211,7 +211,7 @@ mini-ecommerce/
 - **Runtime**: Node.js
 - **Language**: TypeScript
 - **Framework**: Express.js
-- **Database**: PostgreSQL
+- **Database**: SQLite
 - **ORM**: Prisma
 - **Authentication**: JWT (jsonwebtoken)
 - **Validation**: express-validator
@@ -223,8 +223,9 @@ mini-ecommerce/
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- PostgreSQL (v14 or higher)
 - npm or yarn
+
+**Note:** No external database required! This project uses SQLite, which creates a local file-based database automatically.
 
 ### Step 1: Clone the Repository
 
@@ -250,8 +251,8 @@ cp .env.example .env
 Update the `.env` file with your configuration:
 
 ```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/mini_ecommerce?schema=public"
+# Database (SQLite - local file-based database)
+DATABASE_URL="file:./dev.db"
 
 # Server
 PORT=3000
@@ -261,23 +262,32 @@ NODE_ENV=development
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 JWT_EXPIRES_IN=7d
 
-# Admin Credentials
+# Admin Credentials (for seeding)
 ADMIN_EMAIL=admin@ecommerce.com
 ADMIN_PASSWORD=Admin@123
 ```
 
 ### Step 4: Database Setup
 
+**SQLite automatically creates the database file when you run migrations!**
+
 ```bash
 # Generate Prisma Client
 npm run prisma:generate
 
-# Run database migrations
+# Run database migrations (creates dev.db file)
 npm run prisma:migrate
 
-# Seed the database with sample data
+# Seed the database with sample data (admin user + products)
 npm run prisma:seed
 ```
+
+This will:
+- Create a `dev.db` file in your project root (your SQLite database)
+- Set up all database tables
+- Create an admin user (admin@ecommerce.com / Admin@123)
+- Add a sample customer (customer@example.com / Customer@123)
+- Add 5 sample products
 
 ### Step 5: Start the Server
 
