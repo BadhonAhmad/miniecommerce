@@ -1,0 +1,10 @@
+# Migrations Directory
+
+This directory contains Prisma migration files.
+
+Migration files are automatically generated when you run:
+```bash
+npm run prisma:migrate
+```
+
+Do not manually edit migration files.
