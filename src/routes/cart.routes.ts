@@ -4,13 +4,12 @@ import { addToCartValidator, updateCartItemValidator } from '../validators/cart.
 import { validate } from '../middlewares/validate';
 import { authenticate } from '../middlewares/auth';
 import { authorize } from '../middlewares/authorize';
-import { UserRole } from '@prisma/client';
 
 const router = Router();
 const cartController = new CartController();
 
 // All cart routes require authentication and customer role
-router.use(authenticate, authorize(UserRole.CUSTOMER));
+router.use(authenticate, authorize('CUSTOMER'));
 
 /**
  * @route   GET /api/cart

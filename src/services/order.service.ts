@@ -1,24 +1,20 @@
 import prisma from '../config/database';
 import { OrderRepository } from '../repositories/order.repository';
 import { CartRepository } from '../repositories/cart.repository';
-import { ProductRepository } from '../repositories/product.repository';
 import { UserRepository } from '../repositories/user.repository';
-import { ICreateOrderDTO } from '../types';
+import { ICreateOrderDTO, OrderStatus } from '../types';
 import { NotFoundError, BadRequestError, ForbiddenError } from '../utils/errors';
 import { generateOrderNumber, calculateSubtotal } from '../utils/helpers';
-import { OrderStatus, PaymentStatus } from '@prisma/client';
 import { config } from '../config';
 
 export class OrderService {
   private orderRepository: OrderRepository;
   private cartRepository: CartRepository;
-  private productRepository: ProductRepository;
   private userRepository: UserRepository;
 
   constructor() {
     this.orderRepository = new OrderRepository();
     this.cartRepository = new CartRepository();
-    this.productRepository = new ProductRepository();
     this.userRepository = new UserRepository();
   }
 
@@ -161,7 +157,7 @@ export class OrderService {
     }
 
     // Handle cancelled orders - restore stock and increment failed orders
-    if (status === OrderStatus.CANCELLED && order.status !== OrderStatus.CANCELLED) {
+    if (status === 'CANCELLED' && order.status !== 'CANCELLED') {
       await prisma.$transaction(async (tx) => {
         // Restore stock for each item
         for (const item of order.items) {
@@ -204,12 +200,12 @@ export class OrderService {
       throw new NotFoundError('Order not found');
     }
 
-    if (order.paymentStatus !== PaymentStatus.PENDING) {
+    if (order.paymentStatus !== 'PENDING') {
       throw new BadRequestError('Payment has already been processed');
     }
 
-    const newPaymentStatus = success ? PaymentStatus.COMPLETED : PaymentStatus.FAILED;
-    const newOrderStatus = success ? OrderStatus.PROCESSING : order.status;
+    const newPaymentStatus = success ? 'COMPLETED' : 'FAILED';
+    const newOrderStatus = success ? 'PROCESSING' : order.status;
 
     // Update both payment status and order status if payment succeeds
     const updatedOrder = await prisma.$transaction(async (tx) => {

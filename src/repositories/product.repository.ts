@@ -1,14 +1,11 @@
 import prisma from '../config/database';
-import { Product, Prisma } from '@prisma/client';
+import { Product } from '@prisma/client';
 import { ICreateProductDTO, IUpdateProductDTO } from '../types';
 
 export class ProductRepository {
   async create(data: ICreateProductDTO): Promise<Product> {
     return prisma.product.create({
-      data: {
-        ...data,
-        price: new Prisma.Decimal(data.price),
-      },
+      data,
     });
   }
 
@@ -29,14 +26,9 @@ export class ProductRepository {
   }
 
   async update(id: string, data: IUpdateProductDTO): Promise<Product> {
-    const updateData: any = { ...data };
-    if (data.price !== undefined) {
-      updateData.price = new Prisma.Decimal(data.price);
-    }
-
     return prisma.product.update({
       where: { id },
-      data: updateData,
+      data,
     });
   }
 

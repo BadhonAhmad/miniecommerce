@@ -1,4 +1,14 @@
-import { UserRole } from '@prisma/client';
+// Import Prisma-generated types for database models
+import { User as PrismaUser, Order as PrismaOrder } from '@prisma/client';
+
+// Re-export Prisma types for use in repositories
+export type User = PrismaUser;
+export type Order = PrismaOrder;
+
+// String literal types for enum-like behavior (SQLite compatible)
+export type UserRole = 'ADMIN' | 'CUSTOMER';
+export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
 
 export interface IUser {
   id: string;

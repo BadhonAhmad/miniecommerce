@@ -1,6 +1,6 @@
 import prisma from '../config/database';
 import { IRegisterDTO } from '../types';
-import { User, UserRole } from '@prisma/client';
+import { User, UserRole } from '../types';
 
 export class UserRepository {
   async create(data: IRegisterDTO & { role?: UserRole }): Promise<User> {

@@ -7,7 +7,7 @@ import orderRoutes from './order.routes';
 const router = Router();
 
 // Health check
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   res.json({
     success: true,
     message: 'Mini E-Commerce API is running',

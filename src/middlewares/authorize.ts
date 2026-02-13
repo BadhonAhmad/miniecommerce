@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../types';
 import { ForbiddenError, UnauthorizedError } from '../utils/errors';
 
 export const authorize = (...allowedRoles: UserRole[]) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       if (!req.user) {
         throw new UnauthorizedError('Authentication required');

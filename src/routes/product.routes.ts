@@ -4,7 +4,6 @@ import { createProductValidator, updateProductValidator } from '../validators/pr
 import { validate } from '../middlewares/validate';
 import { authenticate } from '../middlewares/auth';
 import { authorize } from '../middlewares/authorize';
-import { UserRole } from '@prisma/client';
 
 const router = Router();
 const productController = new ProductController();
@@ -24,7 +23,7 @@ router.get('/', productController.getAllProducts);
 router.get(
   '/admin',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   productController.getAllProductsAdmin
 );
 
@@ -43,7 +42,7 @@ router.get('/:id', productController.getProductById);
 router.post(
   '/',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   validate(createProductValidator),
   productController.createProduct
 );
@@ -56,7 +55,7 @@ router.post(
 router.put(
   '/:id',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   validate(updateProductValidator),
   productController.updateProduct
 );
@@ -69,8 +68,9 @@ router.put(
 router.delete(
   '/:id',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   productController.deleteProduct
 );
 
 export default router;
+

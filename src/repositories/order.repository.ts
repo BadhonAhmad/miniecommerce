@@ -1,5 +1,5 @@
 import prisma from '../config/database';
-import { Order, OrderStatus, PaymentStatus, Prisma } from '@prisma/client';
+import { Order, OrderStatus, PaymentStatus } from '../types';
 
 interface CreateOrderData {
   userId: string;
@@ -22,16 +22,16 @@ export class OrderRepository {
       data: {
         userId: data.userId,
         orderNumber: data.orderNumber,
-        totalAmount: new Prisma.Decimal(data.totalAmount),
+        totalAmount: data.totalAmount,
         shippingAddress: data.shippingAddress,
         notes: data.notes,
         items: {
           create: data.items.map((item) => ({
             productId: item.productId,
             productName: item.productName,
-            price: new Prisma.Decimal(item.price),
+            price: item.price,
             quantity: item.quantity,
-            subtotal: new Prisma.Decimal(item.subtotal),
+            subtotal: item.subtotal,
           })),
         },
       },
@@ -134,3 +134,4 @@ export class OrderRepository {
     });
   }
 }
+

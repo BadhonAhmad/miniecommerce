@@ -4,9 +4,9 @@ import { sendError } from '../utils/response';
 
 export const errorHandler = (
   err: Error | AppError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   if (err instanceof AppError) {
     sendError(res, err.statusCode, err.message);

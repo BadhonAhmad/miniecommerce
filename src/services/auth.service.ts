@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '../repositories/user.repository';
-import { IRegisterDTO, ILoginDTO } from '../types';
+import { IRegisterDTO, ILoginDTO, UserRole } from '../types';
 import { generateToken } from '../utils/jwt';
 import { BadRequestError, UnauthorizedError } from '../utils/errors';
 
@@ -31,7 +31,7 @@ export class AuthService {
     const token = generateToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as UserRole,
     });
 
     // Return user without password
@@ -65,7 +65,7 @@ export class AuthService {
     const token = generateToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as UserRole,
     });
 
     // Return user without password

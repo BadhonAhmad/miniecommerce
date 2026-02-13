@@ -5,7 +5,7 @@ import { IAuthPayload } from '../types';
 export const generateToken = (payload: IAuthPayload): string => {
   return jwt.sign(payload, config.jwt.secret, {
     expiresIn: config.jwt.expiresIn,
-  });
+  } as any);
 };
 
 export const verifyToken = (token: string): IAuthPayload => {

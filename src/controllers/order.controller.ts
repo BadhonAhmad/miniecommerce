@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { OrderService } from '../services/order.service';
 import { sendSuccess } from '../utils/response';
-import { OrderStatus, UserRole } from '@prisma/client';
+import { OrderStatus } from '../types';
 
 export class OrderController {
   private orderService: OrderService;
@@ -42,7 +42,7 @@ export class OrderController {
   };
 
   // Admin routes
-  getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getAllOrders = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const orders = await this.orderService.getAllOrders();
       sendSuccess(res, 200, 'All orders retrieved successfully', orders);

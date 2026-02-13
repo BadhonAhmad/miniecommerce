@@ -4,7 +4,6 @@ import { createOrderValidator } from '../validators/order.validator';
 import { validate } from '../middlewares/validate';
 import { authenticate } from '../middlewares/auth';
 import { authorize } from '../middlewares/authorize';
-import { UserRole } from '@prisma/client';
 import { body } from 'express-validator';
 
 const router = Router();
@@ -18,7 +17,7 @@ const orderController = new OrderController();
 router.post(
   '/',
   authenticate,
-  authorize(UserRole.CUSTOMER),
+  authorize('CUSTOMER'),
   validate(createOrderValidator),
   orderController.createOrder
 );
@@ -31,7 +30,7 @@ router.post(
 router.get(
   '/',
   authenticate,
-  authorize(UserRole.CUSTOMER),
+  authorize('CUSTOMER'),
   orderController.getOrders
 );
 
@@ -43,7 +42,7 @@ router.get(
 router.get(
   '/:id',
   authenticate,
-  authorize(UserRole.CUSTOMER),
+  authorize('CUSTOMER'),
   orderController.getOrderById
 );
 
@@ -56,7 +55,7 @@ router.get(
 router.get(
   '/admin/all',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   orderController.getAllOrders
 );
 
@@ -68,7 +67,7 @@ router.get(
 router.get(
   '/admin/:id',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   orderController.getOrderByIdAdmin
 );
 
@@ -80,7 +79,7 @@ router.get(
 router.patch(
   '/admin/:id/status',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   validate([
     body('status')
       .isIn(['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
@@ -97,7 +96,7 @@ router.patch(
 router.post(
   '/admin/:id/payment',
   authenticate,
-  authorize(UserRole.ADMIN),
+  authorize('ADMIN'),
   validate([
     body('success')
       .isBoolean()
@@ -107,3 +106,4 @@ router.post(
 );
 
 export default router;
+
