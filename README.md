@@ -143,8 +143,8 @@ MiniEcommerce/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd MiniEcommerce
+   git clone https://github.com/BadhonAhmad/miniecommerce.git
+   cd miniecommerce
    ```
 
 2. **Install dependencies**
