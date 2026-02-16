@@ -1,67 +1,15 @@
 {
   "info": {
     "name": "Mini E-Commerce API",
-    "description": "Complete API collection for Mini E-Commerce platform with authentication, products, cart, and orders",
+    "description": "API collection for Mini E-Commerce platform",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3000/api",
-      "type": "string"
-    },
-    {
-      "key": "adminToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "customerToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "productId",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "orderId",
-      "value": "",
-      "type": "string"
-    }
-  ],
   "item": [
-    {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/health",
-          "host": ["{{baseUrl}}"],
-          "path": ["health"]
-        }
-      }
-    },
     {
       "name": "Authentication",
       "item": [
         {
-          "name": "Register Customer",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('customerToken', response.data.token);",
-                  "}"
-                ]
-              }
-            }
-          ],
+          "name": "Register User",
           "request": {
             "method": "POST",
             "header": [
@@ -72,7 +20,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newcustomer@example.com\",\n  \"password\": \"Customer@123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\"\n}"
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -82,16 +30,14 @@
           }
         },
         {
-          "name": "Login Admin",
+          "name": "Login",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('adminToken', response.data.token);",
-                  "}"
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"token\", jsonData.accessToken);"
                 ]
               }
             }
@@ -106,41 +52,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@ecommerce.com\",\n  \"password\": \"Admin@123\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Login Customer",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('customerToken', response.data.token);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"Customer@123\"\n}"
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -156,7 +68,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -175,7 +87,6 @@
           "name": "Get All Products",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{baseUrl}}/products",
               "host": ["{{baseUrl}}"],
@@ -184,41 +95,9 @@
           }
         },
         {
-          "name": "Get Products by Category",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/products?category=Electronics",
-              "host": ["{{baseUrl}}"],
-              "path": ["products"],
-              "query": [
-                {
-                  "key": "category",
-                  "value": "Electronics"
-                }
-              ]
-            }
-          }
-        },
-        {
           "name": "Get Product by ID",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('productId', response.data.id);",
-                  "}"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{baseUrl}}/products/{{productId}}",
               "host": ["{{baseUrl}}"],
@@ -228,19 +107,6 @@
         },
         {
           "name": "Create Product (Admin)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('productId', response.data.id);",
-                  "}"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
@@ -255,7 +121,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Wireless Mouse\",\n  \"description\": \"Ergonomic wireless mouse with 6 programmable buttons\",\n  \"price\": 29.99,\n  \"stock\": 100,\n  \"category\": \"Accessories\",\n  \"imageUrl\": \"https://example.com/mouse.jpg\"\n}"
+              "raw": "{\n  \"name\": \"Laptop\",\n  \"description\": \"High-performance laptop\",\n  \"price\": 999.99,\n  \"stock\": 50,\n  \"imageUrl\": \"https://example.com/laptop.jpg\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/products",
@@ -267,7 +133,7 @@
         {
           "name": "Update Product (Admin)",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -280,7 +146,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"price\": 24.99,\n  \"stock\": 120\n}"
+              "raw": "{\n  \"price\": 899.99,\n  \"stock\": 75\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/products/{{productId}}",
@@ -290,25 +156,27 @@
           }
         },
         {
-          "name": "Get All Products Admin",
+          "name": "Update Stock (Admin)",
           "request": {
-            "method": "GET",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stock\": 100\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/products/admin?isActive=true",
+              "raw": "{{baseUrl}}/products/{{productId}}/stock",
               "host": ["{{baseUrl}}"],
-              "path": ["products", "admin"],
-              "query": [
-                {
-                  "key": "isActive",
-                  "value": "true"
-                }
-              ]
+              "path": ["products", "{{productId}}", "stock"]
             }
           }
         },
@@ -341,7 +209,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -358,7 +226,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               },
               {
                 "key": "Content-Type",
@@ -370,20 +238,20 @@
               "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 2\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/cart",
+              "raw": "{{baseUrl}}/cart/items",
               "host": ["{{baseUrl}}"],
-              "path": ["cart"]
+              "path": ["cart", "items"]
             }
           }
         },
         {
           "name": "Update Cart Item",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               },
               {
                 "key": "Content-Type",
@@ -395,9 +263,9 @@
               "raw": "{\n  \"quantity\": 3\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/cart/{{productId}}",
+              "raw": "{{baseUrl}}/cart/items/{{cartItemId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["cart", "{{productId}}"]
+              "path": ["cart", "items", "{{cartItemId}}"]
             }
           }
         },
@@ -408,13 +276,13 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/cart/{{productId}}",
+              "raw": "{{baseUrl}}/cart/items/{{cartItemId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["cart", "{{productId}}"]
+              "path": ["cart", "items", "{{cartItemId}}"]
             }
           }
         },
@@ -425,7 +293,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -442,25 +310,12 @@
       "item": [
         {
           "name": "Create Order",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('orderId', response.data.id);",
-                  "}"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               },
               {
                 "key": "Content-Type",
@@ -469,7 +324,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"shippingAddress\": \"123 Main Street, Apt 4B, New York, NY 10001\",\n  \"notes\": \"Please deliver after 5 PM. Ring doorbell twice.\"\n}"
+              "raw": "{\n  \"shippingAddress\": \"123 Main St, New York, NY 10001, USA\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/orders",
@@ -479,13 +334,13 @@
           }
         },
         {
-          "name": "Get User Orders",
+          "name": "Get All Orders",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -502,7 +357,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{customerToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -513,36 +368,27 @@
           }
         },
         {
-          "name": "Get All Orders (Admin)",
+          "name": "Process Payment",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/orders/admin/all",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "admin", "all"]
-            }
-          }
-        },
-        {
-          "name": "Get Order by ID (Admin)",
-          "request": {
-            "method": "GET",
-            "header": [
+                "value": "Bearer {{token}}"
+              },
               {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethod\": \"credit_card\",\n  \"transactionId\": \"txn_123456789\"\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/orders/admin/{{orderId}}",
+              "raw": "{{baseUrl}}/orders/{{orderId}}/payment",
               "host": ["{{baseUrl}}"],
-              "path": ["orders", "admin", "{{orderId}}"]
+              "path": ["orders", "{{orderId}}", "payment"]
             }
           }
         },
@@ -562,91 +408,65 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"PROCESSING\"\n}"
+              "raw": "{\n  \"status\": \"shipped\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/orders/admin/{{orderId}}/status",
+              "raw": "{{baseUrl}}/orders/{{orderId}}/status",
               "host": ["{{baseUrl}}"],
-              "path": ["orders", "admin", "{{orderId}}", "status"]
+              "path": ["orders", "{{orderId}}", "status"]
             }
           }
         },
         {
-          "name": "Simulate Payment Success (Admin)",
+          "name": "Cancel Order",
           "request": {
-            "method": "POST",
+            "method": "DELETE",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{token}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"success\": true\n}"
-            },
             "url": {
-              "raw": "{{baseUrl}}/orders/admin/{{orderId}}/payment",
+              "raw": "{{baseUrl}}/orders/{{orderId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["orders", "admin", "{{orderId}}", "payment"]
-            }
-          }
-        },
-        {
-          "name": "Simulate Payment Failure (Admin)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"success\": false\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/orders/admin/{{orderId}}/payment",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "admin", "{{orderId}}", "payment"]
-            }
-          }
-        },
-        {
-          "name": "Cancel Order (Admin)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"CANCELLED\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/orders/admin/{{orderId}}/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "admin", "{{orderId}}", "status"]
+              "path": ["orders", "{{orderId}}"]
             }
           }
         }
       ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cartItemId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
     }
   ]
 }

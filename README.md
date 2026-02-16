@@ -1,435 +1,332 @@
 # Mini E-Commerce API
 
-A comprehensive backend API for an online shopping platform with authentication, role-based access control, product management, cart operations, and order processing.
-
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white)
+A robust backend system for a mini e-commerce platform built with NestJS, TypeORM, and SQLite. This API provides comprehensive features for authentication, role-based access control, product management, shopping cart operations, and order processing with proper transaction handling.
 
 ## 🚀 Features
 
-### ✨ Core Functionality
-
-- **Authentication & Authorization**
+### Core Functionality
+- ✅ **User Authentication & Authorization**
   - JWT-based authentication
-  - User registration and login
   - Role-based access control (Admin/Customer)
   - Secure password hashing with bcrypt
+  - User registration and login
 
-- **Product Management** (Admin Only)
+- ✅ **Product Management (Admin Only)**
   - Create, read, update, and delete products
-  - Stock management with validation
-  - Product categorization
-  - Active/inactive product states
+  - Manage product stock levels
+  - Product availability tracking
 
-- **Shopping Cart**
-  - Add/remove products
-  - Update quantities
+- ✅ **Shopping Cart Operations**
+  - Add products to cart
+  - Update cart item quantities
+  - Remove items from cart
   - Real-time stock validation
-  - Clear cart functionality
 
-- **Order Processing**
-  - Place orders with cart items
-  - Automatic stock deduction
-  - Order status tracking (Pending → Processing → Shipped → Delivered)
+- ✅ **Order Processing**
+  - Place orders from cart
+  - Backend order total calculation
+  - Automatic stock deduction after order
+  - Database transactions for data consistency
+
+- ✅ **Advanced Features**
   - Payment simulation
-  - Order history
-
-### 🛡️ Business Logic & Data Integrity
-
-- **Stock Management**
-  - Prevents negative inventory
-  - Real-time stock validation
-  - Stock restoration on order cancellation
-  - Transaction-based stock updates
-
-- **Fraud Prevention**
-  - Track cancelled orders per user
-  - Automatic account flagging after multiple cancellations
-  - Configurable threshold for failed orders
-
-- **Data Consistency**
-  - Database transactions for critical operations
-  - Atomic order creation and stock updates
-  - Rollback on failures
-
-## 🏗️ Architecture
-
-### Design Pattern: Layered Architecture
-
-```
-┌─────────────────────────────────────┐
-│         Controllers Layer           │  ← HTTP Request/Response
-├─────────────────────────────────────┤
-│         Services Layer              │  ← Business Logic
-├─────────────────────────────────────┤
-│         Repositories Layer          │  ← Data Access
-├─────────────────────────────────────┤
-│         Database (SQLite)           │  ← Data Storage
-└─────────────────────────────────────┘
-```
-
-### Project Structure
-
-```
-mini-ecommerce/
-├── prisma/
-│   ├── schema.prisma         # Database schema
-│   └── seed.ts               # Database seeding
-├── src/
-│   ├── config/               # Configuration files
-│   │   ├── index.ts
-│   │   └── database.ts
-│   ├── controllers/          # Request handlers
-│   │   ├── auth.controller.ts
-│   │   ├── product.controller.ts
-│   │   ├── cart.controller.ts
-│   │   └── order.controller.ts
-│   ├── services/             # Business logic
-│   │   ├── auth.service.ts
-│   │   ├── product.service.ts
-│   │   ├── cart.service.ts
-│   │   └── order.service.ts
-│   ├── repositories/         # Data access layer
-│   │   ├── user.repository.ts
-│   │   ├── product.repository.ts
-│   │   ├── cart.repository.ts
-│   │   └── order.repository.ts
-│   ├── middlewares/          # Custom middleware
-│   │   ├── auth.ts
-│   │   ├── authorize.ts
-│   │   ├── validate.ts
-│   │   └── errorHandler.ts
-│   ├── validators/           # Input validation
-│   │   ├── auth.validator.ts
-│   │   ├── product.validator.ts
-│   │   ├── cart.validator.ts
-│   │   └── order.validator.ts
-│   ├── routes/               # API routes
-│   │   ├── auth.routes.ts
-│   │   ├── product.routes.ts
-│   │   ├── cart.routes.ts
-│   │   ├── order.routes.ts
-│   │   └── index.ts
-│   ├── types/                # TypeScript types
-│   │   └── index.ts
-│   ├── utils/                # Utility functions
-│   │   ├── errors.ts
-│   │   ├── response.ts
-│   │   ├── jwt.ts
-│   │   └── helpers.ts
-│   ├── app.ts                # Express app setup
-│   └── server.ts             # Server entry point
-├── .env.example              # Environment variables template
-├── .gitignore
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-## 🗄️ Database Schema
-
-### Entity Relationship Diagram
-
-```
-┌─────────────┐
-│    User     │
-├─────────────┤
-│ id (PK)     │
-│ email       │
-│ password    │
-│ firstName   │
-│ lastName    │
-│ role        │
-│ isActive    │
-│ failedOrders│
-└──────┬──────┘
-       │
-       │ 1:1
-       │
-┌──────▼──────┐
-│    Cart     │
-├─────────────┤
-│ id (PK)     │
-│ userId (FK) │
-└──────┬──────┘
-       │
-       │ 1:N
-       │
-┌──────▼──────────┐
-│   CartItem      │
-├─────────────────┤
-│ id (PK)         │
-│ cartId (FK)     │
-│ productId (FK)  │
-│ quantity        │
-└─────────────────┘
-
-┌─────────────┐
-│   Product   │
-├─────────────┤
-│ id (PK)     │
-│ name        │
-│ description │
-│ price       │
-│ stock       │
-│ category    │
-│ isActive    │
-└──────┬──────┘
-       │
-       │ 1:N
-       │
-┌──────▼──────────┐
-│  OrderItem      │
-├─────────────────┤
-│ id (PK)         │
-│ orderId (FK)    │
-│ productId (FK)  │
-│ productName     │
-│ price           │
-│ quantity        │
-│ subtotal        │
-└─────────────────┘
-
-┌─────────────┐
-│    Order    │
-├─────────────┤
-│ id (PK)     │
-│ orderNumber │
-│ userId (FK) │
-│ totalAmount │
-│ status      │
-│ paymentStatus│
-│ shippingAddr│
-└─────────────┘
-```
+  - Order status management (Pending → Paid → Shipped → Delivered)
+  - Order cancellation with stock restoration
+  - Fraud prevention (repeated cancellations tracking)
+  - Comprehensive error handling
 
 ## 🛠️ Tech Stack
 
-- **Runtime**: Node.js
+- **Framework**: NestJS 10.x
 - **Language**: TypeScript
-- **Framework**: Express.js
-- **Database**: SQLite
-- **ORM**: Prisma
-- **Authentication**: JWT (jsonwebtoken)
-- **Validation**: express-validator
-- **Password Hashing**: bcryptjs
-- **Logging**: morgan
+- **Database**: SQLite (file-based, no installation required)
+- **ORM**: TypeORM
+- **Authentication**: JWT (Passport)
+- **Validation**: class-validator, class-transformer
+- **Password Hashing**: bcrypt
+- **Architecture**: Modular monolith with clear separation of concerns
 
-## 📦 Installation & Setup
+## 📁 Project Structure
 
-### Prerequisites
+This project follows a modular architecture for better maintainability and scalability:
+
+```
+src/
+├── modules/              # Feature modules (auth, users, products, cart, orders)
+├── common/               # Shared utilities (guards, decorators, filters)
+├── config/               # Configuration files
+├── database/             # Migrations and seeds
+└── shared/               # Constants and shared types
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed structure documentation.
+
+## 📋 Prerequisites
+
+Before running this project, ensure you have:
 
 - Node.js (v18 or higher)
-- npm or yarn
+- npm or yarn package manager
 
-**Note:** No external database required! This project uses SQLite, which creates a local file-based database automatically.
+**No database installation required!** SQLite is file-based and will be created automatically.
 
-### Step 1: Clone the Repository
+## 🔧 Installation & Setup
+
+### 1. Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd MiniEcommerce
 ```
 
-### Step 2: Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Step 3: Environment Configuration
+### 3. Configure Environment Variables
 
-Create a `.env` file in the root directory:
+Copy the example environment file:
 
 ```bash
-cp .env.example .env
+copy .env.example .env
 ```
 
-Update the `.env` file with your configuration:
+The default configuration is ready to use with SQLite:
 
 ```env
-# Database (SQLite - local file-based database)
-DATABASE_URL="file:./dev.db"
+# Database Configuration (SQLite - No installation required)
+DB_DATABASE=database.sqlite
 
-# Server
-PORT=3000
-NODE_ENV=development
-
-# JWT
+# JWT Configuration
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 JWT_EXPIRES_IN=7d
 
-# Admin Credentials (for seeding)
-ADMIN_EMAIL=admin@ecommerce.com
-ADMIN_PASSWORD=Admin@123
+# Application Configuration
+PORT=3000
+NODE_ENV=development
 ```
 
-### Step 4: Database Setup
+**Note**: Update `JWT_SECRET` with a secure random string before deploying to production.
 
-**SQLite automatically creates the database file when you run migrations!**
+### 4. Seed the Database (Optional)
+
+Populate the database with sample data:
 
 ```bash
-# Generate Prisma Client
-npm run prisma:generate
-
-# Run database migrations (creates dev.db file)
-npm run prisma:migrate
-
-# Seed the database with sample data (admin user + products)
-npm run prisma:seed
+npm run seed
 ```
 
-This will:
-- Create a `dev.db` file in your project root (your SQLite database)
-- Set up all database tables
-- Create an admin user (admin@ecommerce.com / Admin@123)
-- Add a sample customer (customer@example.com / Customer@123)
-- Add 5 sample products
+This creates:
+- Admin user: `admin@example.com` / `Admin@123`
+- Customer user: `customer@example.com` / `Customer@123`
+- Sample products
 
-### Step 5: Start the Server
+### 5. Run the Application
 
 ```bash
-# Development mode
-npm run dev
+# Development mode with hot-reload
+npm run start:dev
 
-# Production mode
+# Production build
 npm run build
-npm start
+npm run start:prod
 ```
 
-The API will be available at `http://localhost:3000/api`
+The API will be available at `http://localhost:3000`
 
-## 📚 API Documentation
+**Database file**: The SQLite database file (`database.sqlite`) will be automatically created in your project root on first run.
 
-### Base URL
+## 📊 Database Schema
+
+### Entity Relationship Diagram
+
 ```
-http://localhost:3000/api
+┌─────────────┐         ┌──────────────┐         ┌─────────────┐
+│    User     │         │   Product    │         │    Cart     │
+├─────────────┤         ├──────────────┤         ├─────────────┤
+│ id (PK)     │────┐    │ id (PK)      │    ┌────│ id (PK)     │
+│ email       │    │    │ name         │    │    │ user_id(FK) │
+│ password    │    │    │ description  │    │    └─────────────┘
+│ firstName   │    │    │ price        │    │           │
+│ lastName    │    │    │ stock        │    │           │
+│ role        │    │    │ imageUrl     │    │           │
+│ isActive    │    │    │ isAvailable  │    │           │
+│ cancelled   │    │    └──────────────┘    │           │
+│ OrdersCount │    │           │            │           │
+└─────────────┘    │           │            │    ┌──────▼──────┐
+       │           │           │            │    │  CartItem   │
+       │           │           │            └────├─────────────┤
+       │           │           │                 │ id (PK)     │
+       │           │           └─────────────────│ cart_id(FK) │
+       │           │                             │ product(FK) │
+       │           │                             │ quantity    │
+       │           │                             └─────────────┘
+       │           │
+       │           │     ┌──────────────┐
+       │           └────▶│    Order     │
+       │                 ├──────────────┤
+       └────────────────▶│ id (PK)      │
+                         │ user_id (FK) │
+                         │ totalAmount  │
+                         │ status       │
+                         │ paymentStatus│
+                         │ shipping...  │
+                         └──────────────┘
+                                │
+                                │
+                         ┌──────▼──────┐
+                         │  OrderItem  │
+                         ├─────────────┤
+                         │ id (PK)     │
+                         │ order_id(FK)│
+                         │ product(FK) │
+                         │ quantity    │
+                         │ price       │
+                         │ subtotal    │
+                         └─────────────┘
 ```
+
+### Database Entities
+
+#### User
+- Stores user information with authentication credentials
+- Tracks role (admin/customer)
+- Maintains fraud detection metrics (cancelled orders count)
+
+#### Product
+- Product catalog with pricing and inventory
+- Stock management
+- Availability status
+
+#### Cart & CartItem
+- User's shopping cart
+- Cart items with quantity tracking
+- Automatic validation against product stock
+
+#### Order & OrderItem
+- Order records with status tracking
+- Order items snapshot (price at time of order)
+- Payment status management
+
+## 🔐 API Endpoints
 
 ### Authentication
 
-All protected endpoints require a JWT token in the Authorization header:
-```
-Authorization: Bearer <your-jwt-token>
-```
-
----
-
-### 🔐 Authentication Endpoints
-
 #### Register User
 ```http
-POST /api/auth/register
+POST /api/v1/auth/register
 Content-Type: application/json
 
 {
   "email": "user@example.com",
-  "password": "Strong@Pass123",
+  "password": "password123",
   "firstName": "John",
   "lastName": "Doe"
+}
+```
+
+#### Login
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
 }
 ```
 
 **Response:**
 ```json
 {
-  "success": true,
-  "message": "User registered successfully",
-  "data": {
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "role": "CUSTOMER"
-    },
-    "token": "jwt-token"
-  }
-}
-```
-
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "Strong@Pass123"
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "customer"
+  },
+  "accessToken": "jwt-token"
 }
 ```
 
 #### Get Profile
 ```http
-GET /api/auth/profile
-Authorization: Bearer <token>
+GET /api/v1/auth/profile
+Authorization: Bearer {token}
 ```
 
----
-
-### 📦 Product Endpoints
+### Products
 
 #### Get All Products (Public)
 ```http
-GET /api/products?category=Electronics
+GET /api/v1/products
 ```
 
-#### Get Product by ID
+#### Get Product by ID (Public)
 ```http
-GET /api/products/:id
+GET /api/v1/products/:id
 ```
 
 #### Create Product (Admin Only)
 ```http
-POST /api/products
-Authorization: Bearer <admin-token>
+POST /api/v1/products
+Authorization: Bearer {admin-token}
 Content-Type: application/json
 
 {
-  "name": "Wireless Headphones",
-  "description": "High-quality noise-cancelling headphones",
+  "name": "Product Name",
+  "description": "Product description",
   "price": 99.99,
-  "stock": 50,
-  "category": "Electronics",
+  "stock": 100,
   "imageUrl": "https://example.com/image.jpg"
 }
 ```
 
-④ Update Product (Admin Only)
+#### Update Product (Admin Only)
 ```http
-PUT /api/products/:id
-Authorization: Bearer <admin-token>
+PATCH /api/v1/products/:id
+Authorization: Bearer {admin-token}
 Content-Type: application/json
 
 {
+  "name": "Updated Name",
   "price": 89.99,
-  "stock": 75
+  "stock": 150
+}
+```
+
+#### Update Stock (Admin Only)
+```http
+PATCH /api/v1/products/:id/stock
+Authorization: Bearer {admin-token}
+Content-Type: application/json
+
+{
+  "stock": 200
 }
 ```
 
 #### Delete Product (Admin Only)
 ```http
-DELETE /api/products/:id
-Authorization: Bearer <admin-token>
+DELETE /api/v1/products/:id
+Authorization: Bearer {admin-token}
 ```
 
----
-
-### 🛒 Cart Endpoints
+### Cart
 
 #### Get Cart
 ```http
-GET /api/cart
-Authorization: Bearer <customer-token>
+GET /api/v1/cart
+Authorization: Bearer {token}
 ```
 
-#### Add to Cart
+#### Add Item to Cart
 ```http
-POST /api/cart
-Authorization: Bearer <customer-token>
+POST /api/v1/cart/items
+Authorization: Bearer {token}
 Content-Type: application/json
 
 {
@@ -440,8 +337,8 @@ Content-Type: application/json
 
 #### Update Cart Item
 ```http
-PUT /api/cart/:productId
-Authorization: Bearer <customer-token>
+PATCH /api/v1/cart/items/:itemId
+Authorization: Bearer {token}
 Content-Type: application/json
 
 {
@@ -449,180 +346,283 @@ Content-Type: application/json
 }
 ```
 
-#### Remove from Cart
+#### Remove Item from Cart
 ```http
-DELETE /api/cart/:productId
-Authorization: Bearer <customer-token>
+DELETE /api/v1/cart/items/:itemId
+Authorization: Bearer {token}
 ```
 
 #### Clear Cart
 ```http
-DELETE /api/cart
-Authorization: Bearer <customer-token>
+DELETE /api/v1/cart
+Authorization: Bearer {token}
 ```
 
----
+### Orders
 
-### 📋 Order Endpoints
-
-#### Create Order
+#### Create Order (Place Order)
 ```http
-POST /api/orders
-Authorization: Bearer <customer-token>
+POST /api/v1/orders
+Authorization: Bearer {token}
 Content-Type: application/json
 
 {
-  "shippingAddress": "123 Main St, City, State, ZIP",
-  "notes": "Please deliver after 5 PM"
+  "shippingAddress": "123 Main St, City, Country"
 }
 ```
 
-#### Get User Orders
+#### Get User's Orders
 ```http
-GET /api/orders
-Authorization: Bearer <customer-token>
+GET /api/v1/orders
+Authorization: Bearer {token}
+```
+
+#### Get All Orders (Admin Only)
+```http
+GET /api/v1/orders
+Authorization: Bearer {admin-token}
 ```
 
 #### Get Order by ID
 ```http
-GET /api/orders/:id
-Authorization: Bearer <customer-token>
+GET /api/v1/orders/:id
+Authorization: Bearer {token}
 ```
 
-#### Get All Orders (Admin)
+#### Process Payment
 ```http
-GET /api/orders/admin/all
-Authorization: Bearer <admin-token>
-```
-
-#### Update Order Status (Admin)
-```http
-PATCH /api/orders/admin/:id/status
-Authorization: Bearer <admin-token>
+POST /api/v1/orders/:id/payment
+Authorization: Bearer {token}
 Content-Type: application/json
 
 {
-  "status": "SHIPPED"
+  "paymentMethod": "credit_card",
+  "transactionId": "txn_123456"
 }
 ```
 
-**Status Options:** `PENDING`, `PROCESSING`, `SHIPPED`, `DELIVERED`, `CANCELLED`
-
-#### Simulate Payment (Admin)
+#### Update Order Status (Admin Only)
 ```http
-POST /api/orders/admin/:id/payment
-Authorization: Bearer <admin-token>
+PATCH /api/v1/orders/:id/status
+Authorization: Bearer {admin-token}
 Content-Type: application/json
 
 {
-  "success": true
+  "status": "shipped"
 }
 ```
 
----
+**Available statuses:** `pending`, `paid`, `shipped`, `delivered`, `cancelled`
 
-## 🔒 Security Features
+#### Cancel Order
+```http
+DELETE /api/v1/orders/:id
+Authorization: Bearer {token}
+```
 
-- **Password Security**: Passwords are hashed using bcrypt with salt rounds
-- **JWT Authentication**: Secure token-based authentication
-- **Input Validation**: All inputs are validated using express-validator
-- **Role-Based Access**: Separate permissions for Admin and Customer roles
-- **SQL Injection Protection**: Prisma ORM prevents SQL injection
-- **Error Handling**: Custom error classes with appropriate HTTP status codes
+## 🔒 Business Logic Implementation
 
-## 🎯 Key Business Rules Implemented
+### Stock Management
+- Stock validation occurs before adding to cart
+- Prevents adding more than available stock
+- Stock is deducted ONLY after successful order placement
+- Stock is restored if order is cancelled
+- Prevents negative inventory
 
-1. ✅ Stock validation before adding to cart
-2. ✅ Stock validation before order placement
-3. ✅ Prevents negative inventory
-4. ✅ Automatic stock deduction on successful order
-5. ✅ Stock restoration on order cancellation
-6. ✅ Order total calculated on backend
-7. ✅ Transaction-based operations for data consistency
-8. ✅ Fraud prevention through cancelled order tracking
-9. ✅ Product price and name snapshot in orders
-10. ✅ Multiple order status management
+### Order Processing
+- Orders are calculated on the backend (price × quantity)
+- Uses database transactions for atomicity
+- Cart is cleared after successful order
+- Order items snapshot prices at time of purchase
+
+### Fraud Prevention
+- Tracks cancelled orders per user
+- Blocks users with 5+ cancellations within 30 days
+- Timestamp tracking of last cancellation
+
+### Role-Based Authorization
+- **Public**: View products
+- **Customer**: Manage cart, place orders, view own orders
+- **Admin**: Full product management, view all orders, update order status
+
+### Payment Simulation
+- 90% success rate simulation
+- Updates order status to "paid" on success
+- Maintains payment status tracking
+
+## 🏗️ Architecture & Design Decisions
+
+### Modular Architecture
+- **Separation of Concerns**: Each feature module (Auth, Products, Cart, Orders) is independent
+- **Dependency Injection**: Leverages NestJS DI for loose coupling
+- **Service Layer**: Business logic encapsulated in services
+
+### Database Design
+- **Normalized Schema**: Prevents data redundancy
+- **Soft Deletes**: Could be implemented for order history
+- **Referential Integrity**: Foreign key constraints ensure data consistency
+- **Cascade Operations**: Automatic cleanup of related records
+
+### Error Handling
+- **Global Exception Filter**: Centralized error handling
+- **HTTP Status Codes**: Proper status codes for all responses
+- **Validation Pipes**: Input validation at DTO level
+- **Custom Exceptions**: Meaningful error messages
+
+### Security
+- **Password Hashing**: bcrypt with salt rounds
+- **JWT Authentication**: Stateless authentication
+- **Token Expiration**: Configurable token lifetime
+- **Protected Routes**: Guard-based authorization
+
+### Transaction Management
+- **Atomic Operations**: Critical operations use database transactions
+- **Rollback on Failure**: Ensures data consistency
+- **Stock Management**: Transactional stock deduction and restoration
 
 ## 🧪 Testing the API
 
-### Default Credentials (After Seeding)
+### Create an Admin User
 
-**Admin Account:**
-- Email: `admin@ecommerce.com`
-- Password: `Admin@123`
+For testing purposes, you can manually create an admin user in your database:
 
-**Customer Account:**
-- Email: `customer@example.com`
-- Password: `Customer@123`
+```sql
+INSERT INTO users (id, email, password, "firstName", "lastName", role, "isActive", "cancelledOrdersCount", "createdAt", "updatedAt")
+VALUES (
+  gen_random_uuid(),
+  'admin@example.com',
+  '$2b$10$YourHashedPasswordHere', -- Hash "admin123" using bcrypt
+  'Admin',
+  'User',
+  'admin',
+  true,
+  0,
+  NOW(),
+  NOW()
+);
+```
 
-### Sample Workflow
+Or use a database seeding script.
 
-1. **Register/Login** as a customer
-2. **Browse products** at `/api/products`
-3. **Add products to cart** at `/api/cart`
-4. **Place an order** at `/api/orders`
-5. **View order history** at `/api/orders`
-6. **Admin** can manage products and orders
+### Postman Collection
 
-## 🚧 Future Enhancements
+Import the following endpoints into Postman for easy testing:
+1. Set up an environment variable `{{baseUrl}}` = `http://localhost:3000/api/v1`
+2. Set up `{{token}}` variable to store JWT after login
+3. Use the endpoints listed above
 
-- [ ] Email notifications for orders
-- [ ] Password reset functionality
-- [ ] Product reviews and ratings
-- [ ] Advanced search and filtering
-- [ ] Pagination for large datasets
-- [ ] Rate limiting
-- [ ] API documentation with Swagger
+## 📝 Key Implementation Highlights
+
+### 1. Transaction Handling
+```typescript
+const queryRunner = this.dataSource.createQueryRunner();
+await queryRunner.connect();
+await queryRunner.startTransaction();
+
+try {
+  // Perform multiple database operations
+  await queryRunner.commitTransaction();
+} catch (error) {
+  await queryRunner.rollbackTransaction();
+  throw error;
+} finally {
+  await queryRunner.release();
+}
+```
+
+### 2. Stock Validation
+```typescript
+if (product.stock < quantity) {
+  throw new BadRequestException(
+    `Only ${product.stock} items available in stock`
+  );
+}
+```
+
+### 3. Backend Price Calculation
+```typescript
+const subtotal = Number(product.price) * cartItem.quantity;
+totalAmount += subtotal;
+```
+
+### 4. Role-Based Guards
+```typescript
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
+```
+
+## 🚧 Assumptions Made
+
+1. **Single Currency**: All prices are in one currency (no multi-currency support)
+2. **Single Cart**: Each user has one active cart at a time
+3. **Stock Units**: Stock is counted in whole numbers (no decimal quantities)
+4. **Shipping**: Basic shipping address as string (no complex address validation)
+5. **Payment**: Simulated payment (no real payment gateway integration)
+6. **Email Verification**: Not implemented (users are active by default)
+7. **Product Images**: URLs only (no file upload implementation)
+8. **Tax Calculation**: Not included in order total
+9. **Shipping Cost**: Not included in calculations
+
+## 🔄 Future Enhancements
+
+- [ ] Migration files instead of synchronize
 - [ ] Unit and integration tests
-- [ ] Docker containerization
-- [ ] CI/CD pipeline
+- [ ] Swagger/OpenAPI documentation
+- [ ] Email notifications (order confirmation, shipping updates)
+- [ ] Product categories and search functionality
+- [ ] Product reviews and ratings
+- [ ] Wishlist functionality
+- [ ] Discount codes and promotions
+- [ ] Advanced inventory management
+- [ ] API rate limiting
+- [ ] Logging with Winston or Pino
+- [ ] Caching with Redis
+- [ ] File upload for product images
+- [ ] Analytics and reporting endpoints
 
-## 📝 Key Architectural Decisions
+## 🐛 Error Handling Examples
 
-### 1. Layered Architecture
-- **Separation of Concerns**: Each layer has a specific responsibility
-- **Maintainability**: Easy to modify and extend
-- **Testability**: Each layer can be tested independently
+### Insufficient Stock
+```json
+{
+  "statusCode": 400,
+  "timestamp": "2026-02-16T10:30:00.000Z",
+  "path": "/api/v1/orders",
+  "method": "POST",
+  "message": "Insufficient stock for Product Name. Available: 5, Requested: 10"
+}
+```
 
-### 2. Repository Pattern
-- **Data Abstraction**: Business logic doesn't depend on data access details
-- **Flexibility**: Easy to switch databases or add caching
+### Unauthorized Access
+```json
+{
+  "statusCode": 403,
+  "timestamp": "2026-02-16T10:30:00.000Z",
+  "path": "/api/v1/products",
+  "method": "POST",
+  "message": "You do not have permission to access this resource"
+}
+```
 
-### 3. Service Layer
-- **Business Logic Centralization**: All business rules in one place
-- **Reusability**: Services can be used by multiple controllers
+### Fraud Detection
+```json
+{
+  "statusCode": 403,
+  "timestamp": "2026-02-16T10:30:00.000Z",
+  "path": "/api/v1/orders",
+  "method": "POST",
+  "message": "Your account has been flagged for suspicious activity. Please contact support."
+}
+```
 
-### 4. Transaction Management
-- **Data Integrity**: Critical operations use database transactions
-- **Consistency**: Ensures all-or-nothing execution
+## 📞 Support
 
-### 5. Type Safety
-- **TypeScript**: Catches errors at compile time
-- **Interfaces**: Clear contracts between layers
-
-### 6. Error Handling
-- **Custom Error Classes**: Meaningful error messages
-- **Centralized Handler**: Consistent error responses
-
-## 🤝 Assumptions Made
-
-1. Payment is simulated (no real payment gateway integration)
-2. Email notifications are not implemented
-3. Product images are stored as URLs (no file upload)
-4. Shipping cost is not calculated
-5. Tax calculation is not included
-6. Single currency (USD assumed)
-7. No product variants (size, color, etc.)
-8. Simple fraud prevention (cancelled order count)
+For issues or questions, please create an issue in the repository.
 
 ## 📄 License
 
-ISC
-
-## 👨‍💻 Author
-
-Built with ❤️ for the Mini E-Commerce assignment
+This project is licensed under the ISC License.
 
 ---
 
-**Need Help?** Open an issue or contact the maintainer.
+**Built with ❤️ using NestJS**
